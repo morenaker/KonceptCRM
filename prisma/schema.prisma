@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(cuid())
+  email      String     @unique
+  name       String
+  password   String
+  role       String     @default("USER") // "ADMIN" | "USER"
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  activities Activity[]
+}
+
+model Company {
+  id            String     @id @default(cuid())
+  name          String
+  ico           String?
+  web           String?
+  contactPerson String?
+  phone         String?
+  email         String?
+  category      String     // "TECHNICAL" | "LABORATORY" | "SECURITY" | "OTHER"
+  stage         String     @default("NEW") // NEW | CONTACTED | WAITING | NEGOTIATION | CLOSED | REJECTED
+  notes         String?
+  followUpDate  DateTime?
+  lastActivity  DateTime   @default(now())
+  position      Int        @default(0)
+  aiAnalysis    String?    // JSON string s posledním výsledkem AI analýzy
+  aiAnalysisAt  DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  activities    Activity[]
+
+  @@index([stage])
+  @@index([category])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      String   // "CALL" | "EMAIL" | "MEETING" | "NOTE" | "STAGE_CHANGE"
+  note      String?
+  date      DateTime @default(now())
+
+  @@index([companyId])
+}
