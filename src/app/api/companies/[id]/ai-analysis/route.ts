@@ -161,8 +161,8 @@ export async function POST(
       model: "claude-opus-4-7",
       max_tokens: 2048,
       system: systemPrompt,
-      tools: [analysisTool],
-      tool_choice: { type: "tool", name: "submit_fit_analysis" },
+      tools: [analysisTool] as any,
+      tool_choice: { type: "tool", name: "submit_fit_analysis" } as any,
       messages: [{ role: "user", content: userPrompt }],
     });
 
