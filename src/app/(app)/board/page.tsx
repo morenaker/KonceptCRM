@@ -85,6 +85,23 @@ export default function BoardPage() {
         onClose={() => setModalOpen(false)}
         onSaved={handleSaved}
         onDeleted={handleDeleted}
+        onOpenExisting={async (id) => {
+          const inMemory = companies.find((x) => x.id === id);
+          if (inMemory) {
+            setSelected(inMemory);
+            setModalOpen(true);
+            return;
+          }
+          const res = await fetch(`/api/companies/${id}`);
+          if (res.ok) {
+            const fresh = await res.json();
+            setCompanies((prev) =>
+              prev.some((x) => x.id === fresh.id) ? prev : [...prev, fresh]
+            );
+            setSelected(fresh);
+            setModalOpen(true);
+          }
+        }}
       />
     </div>
   );

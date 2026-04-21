@@ -9,6 +9,7 @@ type Props = {
   onClose: () => void;
   onSaved: (c: Company) => void;
   onDeleted: (id: string) => void;
+  onOpenExisting?: (id: string) => void;
 };
 
 function toDateInput(d: string | null | undefined): string {
@@ -52,6 +53,7 @@ export default function CompanyModal({
   onClose,
   onSaved,
   onDeleted,
+  onOpenExisting,
 }: Props) {
   const isEdit = !!company;
   const [form, setForm] = useState({
@@ -95,6 +97,10 @@ export default function CompanyModal({
   const [aiAnalysisAt, setAiAnalysisAt] = useState<string | null>(null);
   const [emailCopied, setEmailCopied] = useState(false);
 
+  const [duplicate, setDuplicate] = useState<{ id: string; name: string } | null>(
+    null
+  );
+
   useEffect(() => {
     if (!open) return;
     setError(null);
@@ -135,6 +141,7 @@ export default function CompanyModal({
     setAresError(null);
     setAiError(null);
     setEmailCopied(false);
+    setDuplicate(null);
     if (company?.aiAnalysis) {
       try {
         setAiResult(JSON.parse(company.aiAnalysis));
@@ -151,23 +158,35 @@ export default function CompanyModal({
 
   if (!open) return null;
 
+  async function saveCompany(force: boolean) {
+    const payload = {
+      ...form,
+      followUpDate: form.followUpDate || null,
+    };
+    const base = isEdit ? `/api/companies/${company!.id}` : "/api/companies";
+    const url = force ? `${base}?force=true` : base;
+    const res = await fetch(url, {
+      method: isEdit ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    return res;
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setDuplicate(null);
     try {
-      const payload = {
-        ...form,
-        followUpDate: form.followUpDate || null,
-      };
-      const res = await fetch(
-        isEdit ? `/api/companies/${company!.id}` : "/api/companies",
-        {
-          method: isEdit ? "PATCH" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+      const res = await saveCompany(false);
+      if (res.status === 409) {
+        const d = await res.json().catch(() => ({}));
+        if (d?.existing?.id) {
+          setDuplicate(d.existing);
+          return;
         }
-      );
+      }
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         throw new Error(
@@ -181,6 +200,35 @@ export default function CompanyModal({
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleForceSave() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await saveCompany(true);
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(
+          typeof d.error === "string" ? d.error : "Uložení se nezdařilo"
+        );
+      }
+      const saved = await res.json();
+      setDuplicate(null);
+      onSaved(saved);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleOpenExisting() {
+    if (!duplicate) return;
+    const id = duplicate.id;
+    setDuplicate(null);
+    onClose();
+    onOpenExisting?.(id);
   }
 
   async function handleDelete() {
@@ -548,6 +596,45 @@ export default function CompanyModal({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {duplicate && (
+            <div className="p-3 bg-amber-50 border border-amber-300 rounded text-sm">
+              <div className="font-semibold text-amber-900 mb-1">
+                Firma s tímto IČO už v CRM existuje
+              </div>
+              <div className="text-amber-800 mb-2">
+                Název existující firmy: <strong>{duplicate.name}</strong>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setDuplicate(null)}
+                  className="btn-secondary"
+                  disabled={loading}
+                >
+                  Zrušit
+                </button>
+                {onOpenExisting && (
+                  <button
+                    type="button"
+                    onClick={handleOpenExisting}
+                    className="btn-primary"
+                    disabled={loading}
+                  >
+                    Otevřít existující
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleForceSave}
+                  className="btn-danger"
+                  disabled={loading}
+                >
+                  {loading ? "Ukládám…" : "Přesto uložit"}
+                </button>
+              </div>
             </div>
           )}
 

@@ -14,6 +14,7 @@ export default function Navbar() {
   const links = [
     { href: "/board", label: "Nástěnka" },
     { href: "/dashboard", label: "Přehled" },
+    { href: "/prospector", label: "Prospektor" },
     ...(isAdmin ? [{ href: "/users", label: "Uživatelé" }] : []),
   ];
 

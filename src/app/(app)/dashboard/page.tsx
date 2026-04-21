@@ -48,6 +48,27 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <h1 className="text-xl font-bold">Přehled</h1>
 
+      {/* AI Prospektor CTA */}
+      <Link
+        href="/prospector"
+        className="block rounded-lg border border-violet-300 bg-gradient-to-r from-violet-50 to-white p-4 hover:border-violet-500 hover:shadow-sm transition"
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-semibold text-violet-800">
+              🔎 AI Prospektor — najít nové klienty
+            </div>
+            <div className="text-xs text-slate-600 mt-0.5">
+              Claude prohledá český internet a navrhne firmy sedící do ICP
+              KonceptHK. Vyloučí ty, které už v CRM máš.
+            </div>
+          </div>
+          <div className="text-sm font-medium text-violet-700 whitespace-nowrap">
+            Spustit →
+          </div>
+        </div>
+      </Link>
+
       {/* summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Celkem firem" value={data.total} accent="text-brand-700" />

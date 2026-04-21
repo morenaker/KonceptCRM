@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/guards";
+import { isValidIco, normalizeIco } from "@/lib/validators";
 
 const companyCreateSchema = z.object({
   name: z.string().min(1, "Název je povinný"),
@@ -52,12 +53,37 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireSession();
   if (error) return error;
 
+  const { searchParams } = new URL(req.url);
+  const force = searchParams.get("force") === "true";
+
   const body = await req.json();
   const parsed = companyCreateSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
   const data = parsed.data;
+
+  const icoNorm = normalizeIco(data.ico);
+  if (icoNorm) {
+    if (!isValidIco(icoNorm)) {
+      return NextResponse.json(
+        { error: "Neplatné IČO (chybný kontrolní součet)." },
+        { status: 400 }
+      );
+    }
+    if (!force) {
+      const dup = await prisma.company.findFirst({
+        where: { ico: icoNorm },
+        select: { id: true, name: true },
+      });
+      if (dup) {
+        return NextResponse.json(
+          { error: "duplicate", existing: dup },
+          { status: 409 }
+        );
+      }
+    }
+  }
 
   const lastInStage = await prisma.company.findFirst({
     where: { stage: data.stage },
@@ -68,7 +94,7 @@ export async function POST(req: NextRequest) {
   const company = await prisma.company.create({
     data: {
       name: data.name,
-      ico: data.ico || null,
+      ico: icoNorm || null,
       web: data.web || null,
       contactPerson: data.contactPerson || null,
       phone: data.phone || null,

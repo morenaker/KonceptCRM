@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/guards";
+import { isValidIco, normalizeIco } from "@/lib/validators";
 
 const companyUpdateSchema = z.object({
   name: z.string().min(1).optional(),
@@ -46,6 +47,9 @@ export async function PATCH(
   const { session, error } = await requireSession();
   if (error) return error;
 
+  const { searchParams } = new URL(req.url);
+  const force = searchParams.get("force") === "true";
+
   const body = await req.json();
   const parsed = companyUpdateSchema.safeParse(body);
   if (!parsed.success) {
@@ -56,9 +60,35 @@ export async function PATCH(
   const existing = await prisma.company.findUnique({ where: { id: params.id } });
   if (!existing) return NextResponse.json({ error: "Nenalezeno" }, { status: 404 });
 
+  let icoForUpdate: string | null | undefined;
+  if (data.ico === undefined) {
+    icoForUpdate = undefined;
+  } else {
+    const icoNorm = normalizeIco(data.ico);
+    if (icoNorm && !isValidIco(icoNorm)) {
+      return NextResponse.json(
+        { error: "Neplatné IČO (chybný kontrolní součet)." },
+        { status: 400 }
+      );
+    }
+    if (icoNorm && !force) {
+      const dup = await prisma.company.findFirst({
+        where: { ico: icoNorm, NOT: { id: params.id } },
+        select: { id: true, name: true },
+      });
+      if (dup) {
+        return NextResponse.json(
+          { error: "duplicate", existing: dup },
+          { status: 409 }
+        );
+      }
+    }
+    icoForUpdate = icoNorm || null;
+  }
+
   const updateData: any = {
     ...data,
-    ico: data.ico === undefined ? undefined : data.ico || null,
+    ico: icoForUpdate,
     web: data.web === undefined ? undefined : data.web || null,
     contactPerson:
       data.contactPerson === undefined ? undefined : data.contactPerson || null,
