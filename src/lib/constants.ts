@@ -2,6 +2,7 @@ export const CATEGORIES = [
   { value: "TECHNICAL", label: "Technické služby" },
   { value: "LABORATORY", label: "Laboratoře" },
   { value: "SECURITY", label: "Bezpečnostní služby" },
+  { value: "ESHOP", label: "E-shop" },
   { value: "OTHER", label: "Ostatní" },
 ] as const;
 

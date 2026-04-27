@@ -7,7 +7,7 @@ type Prospect = {
   ico: string | null;
   web: string | null;
   contactPerson: string | null;
-  category: "TECHNICAL" | "LABORATORY" | "SECURITY" | "OTHER";
+  category: "TECHNICAL" | "LABORATORY" | "SECURITY" | "ESHOP" | "OTHER";
   score: number;
   reasoning: string;
   signal: string | null;
@@ -16,7 +16,7 @@ type Prospect = {
 
 export default function ProspectorPage() {
   const [segment, setSegment] =
-    useState<"TECHNICAL" | "LABORATORY" | "SECURITY" | "OTHER">("TECHNICAL");
+    useState<"TECHNICAL" | "LABORATORY" | "SECURITY" | "ESHOP" | "OTHER">("TECHNICAL");
   const [region, setRegion] = useState("");
   const [hint, setHint] = useState("");
   const [count, setCount] = useState(8);

@@ -11,7 +11,7 @@ const companyCreateSchema = z.object({
   contactPerson: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   email: z.string().email("Neplatný e-mail").optional().or(z.literal("")).nullable(),
-  category: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "OTHER"]),
+  category: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "ESHOP", "OTHER"]),
   stage: z
     .enum(["NEW", "CONTACTED", "WAITING", "NEGOTIATION", "CLOSED", "REJECTED"])
     .default("NEW"),

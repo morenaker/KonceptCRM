@@ -26,7 +26,7 @@ model Company {
   contactPerson String?
   phone         String?
   email         String?
-  category      String     // "TECHNICAL" | "LABORATORY" | "SECURITY" | "OTHER"
+  category      String     // "TECHNICAL" | "LABORATORY" | "SECURITY" | "ESHOP" | "OTHER"
   stage         String     @default("NEW") // NEW | CONTACTED | WAITING | NEGOTIATION | CLOSED | REJECTED
   notes         String?
   followUpDate  DateTime?

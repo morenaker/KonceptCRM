@@ -15,7 +15,7 @@ const bulkSchema = z.object({
         ico: z.string().optional().nullable(),
         web: z.string().optional().nullable(),
         contactPerson: z.string().optional().nullable(),
-        category: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "OTHER"]),
+        category: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "ESHOP", "OTHER"]),
         notes: z.string().optional().nullable(),
       })
     )

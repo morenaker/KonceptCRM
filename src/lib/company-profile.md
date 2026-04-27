@@ -16,6 +16,7 @@ Specializujeme se na dodávání, implementaci a správu ERP **HELIOS Nephrite**
 2. **Laboratoře** (typ SGS) — robustní řešení napříč laboratorními a certifikačními službami s důrazem na data a reporting.
 3. **Bezpečnostní služby** (typ Patrol) — řízení velké personální agendy, směn, oprávnění a certifikací s návazností na ekonomiku a fakturaci.
 4. **Pojišťovací makléři a příspěvkové organizace** — hotové systémy pro správu zakázek a provizí, centrálně řízené modely s portály a finančním plánováním.
+5. **E-shop pro HELIOS Nephrite** — vlastní e-shop rozhraní plně integrované s HELIOS Nephrite. Veškerá správa katalogu, skladu, objednávek a fakturace probíhá přímo v Heliosu, e-shop je tenká vrstva nad ním. Jiný profil cílové firmy než u prodeje samotného HELIOSu — viz samostatná sekce níže.
 
 ## Obchodní model
 
@@ -28,6 +29,26 @@ Specializujeme se na dodávání, implementaci a správu ERP **HELIOS Nephrite**
 - **Velikost firmy:** minimálně ~50 zaměstnanců.
 - **Obrat:** řádově ~100 000 000 Kč, hlavně musí mít schopnost investovat ~2 mil. Kč do IT.
 - **Rozhodovatel:** statutární orgán / majitel.
+
+## E-shop — detail ICP a tři pod-typy
+
+**Velikost cílové firmy:** od ~30 zaměstnanců. Obrat není rozhodující.
+
+**Tři pod-typy klientů (od nejvyšší pravděpodobnosti konverze k nejnižší):**
+
+1. **Mají HELIOS Nephrite + cizí/zastaralý e-shop** — nejvyšší fit. Argumentace „přepojíme e-shop přímo do Heliosu, který už používáte" je přímá. Při vyhledávání cílit na firmy s referencí na HELIOS a zároveň e-shopem na Shoptetu, WooCommerce, vlastním starém řešení apod.
+2. **Výrobní firma s prodejem, nemá e-shop** — střední fit. Argument: rozšíření prodejních kanálů + e-shop napojený přímo na ERP.
+3. **Výrobní firma s prodejem, nemá HELIOS ani e-shop** — nejnižší fit, ale **největší zakázka** (e-shop + HELIOS implementace současně). Vhodné když chybí silnější leady.
+
+**USP e-shopu:**
+- Plná integrace s HELIOS Nephrite — žádné synchronizace, e-shop pracuje přímo s daty Heliosu.
+- Veškerá obchodní logika (ceny, slevy, sklady, fakturace) je v Heliosu, na e-shopu se nic neudržuje dvakrát.
+
+**Nákupní signály pro e-shop:**
+- **Firma už používá HELIOS Nephrite** — nejsilnější trigger.
+- Zastaralý / pomalý / nefunkční stávající e-shop.
+- Žádný e-shop a viditelně mají co prodávat (katalog produktů, B2B offline prodej).
+- Migrace ERP, růst obratu, expanze prodejních kanálů.
 
 ## Konkurence a diferenciace
 
@@ -54,3 +75,5 @@ Specializujeme se na dodávání, implementaci a správu ERP **HELIOS Nephrite**
 Pro každou cílovou firmu chceme:
 1. **Fit skóre 1–10** — jak dobře firma zapadá do našeho ICP a jak pravděpodobná je konverze.
 2. **Draft prvního e-mailu** — úvodní oslovení v češtině, profesionální tón, zmínka relevantního nákupního signálu (pokud je známý), konkrétní benefit pro jejich obor, jasný call-to-action (schůzka/krátký hovor).
+
+**Speciální pravidlo pro kategorii „E-shop":** Pokud je firma v kategorii **E-shop**, fit skóre hodnoť podle e-shop ICP (3 pod-typy výše), **ne podle HELIOS ICP** (jiná velikost firmy, jiné signály). V draftu prvního e-mailu vždy zmiň přímou integraci s HELIOS Nephrite jako klíčový benefit. Pokud z dostupných dat víš, že firma už HELIOS používá, v analýze to explicitně uveď — je to nejsilnější trigger.

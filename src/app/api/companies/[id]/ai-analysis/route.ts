@@ -9,6 +9,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   TECHNICAL: "Technické služby",
   LABORATORY: "Laboratoře",
   SECURITY: "Bezpečnostní služby",
+  ESHOP: "E-shop (rozhraní propojené s HELIOS Nephrite)",
   OTHER: "Jiné",
 };
 

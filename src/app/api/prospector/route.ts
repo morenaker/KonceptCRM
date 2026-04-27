@@ -10,7 +10,7 @@ import path from "path";
 export const maxDuration = 60;
 
 const requestSchema = z.object({
-  segment: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "OTHER"]),
+  segment: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "ESHOP", "OTHER"]),
   region: z.string().optional().nullable(),
   hint: z.string().optional().nullable(),
   count: z.number().int().min(3).max(15).default(8),
@@ -20,6 +20,7 @@ const SEGMENT_LABEL: Record<string, string> = {
   TECHNICAL: "Technické služby",
   LABORATORY: "Laboratoře a certifikační služby",
   SECURITY: "Bezpečnostní a security služby",
+  ESHOP: "E-shop (vlastní rozhraní plně propojené s HELIOS Nephrite)",
   OTHER: "Jiné (pojišťovací makléři, příspěvkové organizace, atd.)",
 };
 
@@ -52,7 +53,7 @@ const submitTool = {
             },
             category: {
               type: "string",
-              enum: ["TECHNICAL", "LABORATORY", "SECURITY", "OTHER"],
+              enum: ["TECHNICAL", "LABORATORY", "SECURITY", "ESHOP", "OTHER"],
               description: "Segment zařazení (měl by odpovídat zadanému segmentu).",
             },
             score: {
@@ -138,6 +139,22 @@ export async function POST(req: NextRequest) {
   const excludeIcos = new Set(existing.map((e) => (e.ico || "").trim()).filter(Boolean));
   const excludeNames = existing.map((e) => e.name.toLowerCase());
 
+  const isEshop = segment === "ESHOP";
+  const eshopHint = isEshop
+    ? [
+        "",
+        "=== POKYNY PRO SEGMENT E-SHOP ===",
+        "U tohoto segmentu hledáme zákazníky e-shop rozhraní (KonceptHK ho prodává jako vlastní produkt plně integrovaný s HELIOS Nephrite). Tedy NE tvůrce e-shopů — Shoptet, Upgates, WooCommerce specialisté apod. jsou KONKURENCE, ne klienti.",
+        "Ideální klienty hledej ve 3 pod-typech (od nejvyšší pravděpodobnosti konverze):",
+        "1) Firmy které prokazatelně používají HELIOS Nephrite (ekonomický systém) a zároveň mají cizí/zastaralý e-shop (Shoptet, WooCommerce, vlastní starý systém). NEJVYŠŠÍ FIT.",
+        "2) Výrobní firmy s prodejem které vůbec nemají e-shop, ale viditelně mají co prodávat (katalog produktů, B2B prodej offline).",
+        "3) Výrobní firmy s prodejem bez HELIOSu i bez e-shopu — největší zakázka (e-shop + HELIOS současně), ale nejnižší pravděpodobnost.",
+        "Při web searchi: dotazy typu 'HELIOS Nephrite reference', 'česká výrobní firma e-shop B2B', kombinace s regionem.",
+        "Min. velikost firmy 30 zaměstnanců.",
+        "V poli signal vždy uveď zjištěný stav, např. 'má HELIOS Nephrite, e-shop na Shoptetu' / 'výrobce X bez e-shopu' / 'výrobce Y, ERP neznámý, bez e-shopu'.",
+      ].join("\n")
+    : "";
+
   const systemPrompt = [
     "Jsi B2B obchodní prospektor pro českou firmu KonceptHK (HELIOS Nephrite ERP).",
     "Tvým úkolem je najít na českém internetu reálné české firmy, které nejlépe zapadají do ICP KonceptHK.",
@@ -145,6 +162,7 @@ export async function POST(req: NextRequest) {
     "Upřednostňuj firmy s nákupním signálem (změna vedení je nejsilnější).",
     "NIKDY nevymýšlej IČO — pokud si nejsi jistý, uveď null.",
     "Až máš dost informací, zavolej nástroj submit_prospects JEDNOU s celým seznamem.",
+    eshopHint,
     "",
     "=== PROFIL A ICP KONCEPTHK ===",
     profile,

@@ -11,7 +11,9 @@ const companyUpdateSchema = z.object({
   contactPerson: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   email: z.string().email().optional().or(z.literal("")).nullable(),
-  category: z.enum(["TECHNICAL", "LABORATORY", "SECURITY", "OTHER"]).optional(),
+  category: z
+    .enum(["TECHNICAL", "LABORATORY", "SECURITY", "ESHOP", "OTHER"])
+    .optional(),
   stage: z
     .enum(["NEW", "CONTACTED", "WAITING", "NEGOTIATION", "CLOSED", "REJECTED"])
     .optional(),
